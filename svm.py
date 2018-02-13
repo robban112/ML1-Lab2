@@ -5,6 +5,17 @@ import matplotlib.pyplot as plt
 global t
 global P
 
+def indicator():
+    # Implement the indicator function (equation 6) which uses the non-zero αi
+    #’s together with their ⃗xi
+    #’s and ti
+    #’s to classify new points.
+    pass
+
+def zerofun(vector):
+    # calculates the value which should be constrained to zero.
+    pass
+
 def initalize_P(x, t, K):
     global P
     P = numpy.array([[t[i]*t[j]]*K(x[i], x[j]) for i in range(0,N)] for j in range(0,N)])
