@@ -42,7 +42,7 @@ def ind_no_b(s, ps, K):
     as well as in the calculation of b.
     """
     sup_vecs = support_vectors(ps)
-    sum_f = lambda p: p.alpha*p.target+K(s,p.point)
+    sum_f = lambda p: p.alpha*p.target*K(s,p.point)
     return sum(map(sum_f, sup_vecs))
 
 def ind(s, ps, K, b):
