@@ -5,33 +5,28 @@ from collections import namedtuple
 
 global t
 global P
+global N
+global C
 
-def indicator():
-    # Implement the indicator function (equation 6) which uses the non-zero αi
-    #’s together with their ⃗xi
-    #’s and ti
-    #’s to classify new points.
-    pass
+def zerofun(alfa):
+    " Defines the upper bound to incorporate slack variables "
+    fc = all(0 <= a and a <= C for a in alfa)
+    sc = sum(numpy.dot(alfa, t)) == 0
+    return fc and sc
 
-def zerofun(vector):
-    # calculates the value which should be constrained to zero.
-    pass
-
-def initalize_P(x, t, K):
+def initialize_P(x, t, K):
+    "Initialize the P matrix used in objective func"
     global P
-    P = numpy.array([[t[i]*t[j]]*K(x[i], x[j]) for i in range(0,N)] for j in range(0,N)])
+    P = numpy.array([[t[i]*t[j]*K(x[i], x[j]) for i in range(0,N)] for j in range(0,N)])
 
 def objective(alfa):
-    m = numpy.matrix([[alfa[i]*alfa[j]*P[i][j] for i in range(0,N)] for j in range(0,N)])
-    n = numpy.array([alfa[i] for i in range(0,N))
-    return m.sum()/2 - n.sum()
+    return numpy.dot(alfa, P)/2 - numpy.sum(alfa)
 
 def K(a,b):
     return linear_kernel(a,b)
 
 def linear_kernel(a, b):
-    assert len(a) == len(b)
-    return sum([a[i][0]*b[i] for i in range(len(b))])
+    return numpy.dot(a,b)
 
 # A data point along with its corresponding target and alpha value
 DataPointInfo = namedtuple('DataPointInfo', ['point','target','alpha'])
@@ -61,14 +56,19 @@ def ind(s, ps, K, b):
     return ind_no_b(s, ps, K) - b
 
 def calc_b(ps, K):
-    "Calculate the b value"
     s, s_t, _ = next(support_vectors(ps))
     return ind_no_b(s, ps, K) - s_t
 
 def main():
-    N=1
+    global t, N, C
+    N=10
+    C=5
+    x=[1,2,3,4,5,6,7,8,9,10]
+    t=[1,2,3,4,5,6,7,8,9,10]
+    initialize_P(x, t, K)
     start = numpy.zeros(N)
-    ret = minimize(objective, start, bounds=B, constraints=XC)
+    ret = minimize(objective, start, bounds=[(0, C) for b in range(N)],
+            constraints={'type':'eq', 'fun':zerofun})
     alpha = ret['x']
 
 if __name__ == "__main__":
