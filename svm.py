@@ -10,9 +10,7 @@ global C
 
 def zerofun(alfa):
     " Defines the upper bound to incorporate slack variables "
-    fc = all(0 <= a and a <= C for a in alfa)
-    sc = sum(numpy.dot(alfa, t)) == 0
-    return fc and sc
+    return sum(numpy.dot(alfa, t)) == 0
 
 def initialize_P(x, t, K):
     "Initialize the P matrix used in objective func"
