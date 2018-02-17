@@ -15,8 +15,8 @@ points in random order.
 Datapoint = namedtuple('Datapoint', ['coords','target'])
 
 def norm_points(N, mu_x, mu_y, sigma):
-    """Get N points with x-values sampled from a N(mu_x, sigma²) distribution
-    and y-values sampled from a N(mu_y, sigma²) distribution.
+    """Get N points with x-values sampled from a N(mu_x, sigma^2) distribution
+    and y-values sampled from a N(mu_y, sigma^2) distribution.
     """
     return sigma * numpy.random.randn(N, 2) + [mu_x,mu_y]
 
