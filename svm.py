@@ -5,7 +5,6 @@ from collections import namedtuple
 import testdata_generator as test_gen
 
 global t
-global P
 global N
 global C
 
@@ -13,12 +12,7 @@ def zerofun(alfa):
     " Defines the upper bound to incorporate slack variables "
     return numpy.dot(alfa, t)
 
-def initialize_P(x, t, K):
-    "Initialize the P matrix used in objective func"
-    global P
-    P = numpy.array([[t[i]*t[j]*K(x[i], x[j]) for i in range(0,N)] for j in range(0,N)])
-
-def objective(alfa):
+def objective(alfa, P):
     m = numpy.matrix([[alfa[i]*alfa[j]*P[i][j] for i in range(0,N)] for j in range(0,N)])
     n = numpy.array([alfa[i] for i in range(0,N)])
     return m.sum()/2 - n.sum()
@@ -84,9 +78,9 @@ def main():
     x = [p.coords for p in data_points]
     t = [p.target for p in data_points]
     N = len(data_points)
-    initialize_P(x, t, K)
     start = numpy.zeros(N)
-    ret = minimize(objective, start, bounds=[(0, C) for b in range(N)],
+    P = numpy.array([[t[i]*t[j]*K(x[i], x[j]) for i in range(0,N)] for j in range(0,N)])
+    ret = minimize(objective, start, args=(P), bounds=[(0, C) for b in range(N)],
             constraints={'type':'eq', 'fun':zerofun})
     alpha = ret['x']
     ps = list(map(DataPointInfo._make, zip(x,t,alpha)))
