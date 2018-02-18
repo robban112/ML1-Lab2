@@ -45,16 +45,15 @@ def ind_no_b(s, ps, K):
     """The summation that appears in the indicator function,
     as well as in the calculation of b.
     """
-    sup_vecs = support_vectors(ps)
     sum_f = lambda p: p.alpha*p.target*K(s,p.point)
-    return sum(map(sum_f, sup_vecs))
+    return sum(map(sum_f, ps))
 
 def ind(s, ps, K, b):
     "The indicator function for vector s"
     return ind_no_b(s, ps, K) - b
 
 def calc_b(ps, K):
-    s, s_t, _ = next(support_vectors(ps))
+    s, s_t, _ = ps[0]
     return ind_no_b(s, ps, K) - s_t
 
 def plot(classA, classB, ps, b):
@@ -83,7 +82,7 @@ def main():
     ret = minimize(objective, start, args=(P), bounds=[(0, C) for b in range(N)],
             constraints={'type':'eq', 'fun':zerofun})
     alpha = ret['x']
-    ps = list(map(DataPointInfo._make, zip(x,t,alpha)))
+    ps = list(filter(is_support_vector, map(DataPointInfo._make, zip(x,t,alpha))))
     b = calc_b(ps, K)
     plot(classA, classB, ps, b)
 
