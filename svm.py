@@ -81,6 +81,9 @@ def main():
     P = numpy.array([[t[i]*t[j]*K(x[i], x[j]) for i in range(0,N)] for j in range(0,N)])
     ret = minimize(objective, start, args=(P), bounds=[(0, C) for b in range(N)],
             constraints={'type':'eq', 'fun':zerofun})
+    if not ret.success:
+        print("Optimization was unsuccessful")
+        return
     alpha = ret['x']
     ps = list(filter(is_support_vector, map(DataPointInfo._make, zip(x,t,alpha))))
     b = calc_b(ps, K)
