@@ -17,9 +17,6 @@ def objective(alfa, P):
     n = numpy.array([alfa[i] for i in range(0,N)])
     return m.sum()/2 - n.sum()
 
-# def objective(alfa):
-#     return sum(numpy.dot(alfa,P))/2 - numpy.sum(alfa)
-
 def K(a,b):
     return linear_kernel(a,b)
 
