@@ -6,7 +6,6 @@ import testdata_generator as test_gen
 
 global t
 global N
-global C
 
 def zerofun(alfa):
     " Defines the upper bound to incorporate slack variables "
@@ -66,13 +65,12 @@ def plot(classA, classB, ps, b):
 
 
 def main():
-    global t, N, C
-    # N=10
-    C=20
+    global t, N
     classA, classB = test_gen.test_classes_1()
     data_points = test_gen.generate_input_data(classA, classB)
     x = [p.coords for p in data_points]
     t = [p.target for p in data_points]
+    C=20
     N = len(data_points)
     start = numpy.zeros(N)
     P = numpy.array([[t[i]*t[j]*K(x[i], x[j]) for i in range(0,N)] for j in range(0,N)])
