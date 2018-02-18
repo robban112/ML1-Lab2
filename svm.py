@@ -62,7 +62,7 @@ def plot(classA, classB, ps, b):
     plt.axis('equal')
     xgrid=numpy.linspace(-5,5)
     ygrid=numpy.linspace(-4,4)
-    grid=numpy.array([[ind((x,y), ps, K, b) for y in ygrid ] for x in xgrid])
+    grid=numpy.array([[ind((x,y), ps, K, b) for x in xgrid ] for y in ygrid])
     plt.contour(xgrid, ygrid, grid, (-1.0,0.0,1.0), colors =('red' ,'black' , 'blue'),
                                                               linewidths=(1 , 3 , 1))
     plt.show()
