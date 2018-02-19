@@ -3,6 +3,7 @@ from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 from collections import namedtuple
 import testdata_generator as test_gen
+from numpy import linalg as LA
 
 global t
 global N
@@ -17,10 +18,16 @@ def objective(alfa, P):
     return m.sum()/2 - n.sum()
 
 def K(a,b):
-    return linear_kernel(a,b)
+    return radial_kernel(0.5,a,b)
 
 def linear_kernel(a, b):
     return numpy.dot(a,b)
+
+def radial_kernel(sigma, x, y):
+    diff = numpy.subtract(x,y)
+    norm = LA.norm(diff)
+    exp = -(norm**2 / 2*(sigma**2))
+    return math.exp(exp)
 
 # A data point along with its corresponding target and alpha value
 DataPointInfo = namedtuple('DataPointInfo', ['point','target','alpha'])
