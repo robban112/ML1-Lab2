@@ -29,6 +29,10 @@ def radial_kernel(sigma, x, y):
     exp = -(norm**2 / 2*(sigma**2))
     return math.exp(exp)
 
+def polynomial_kernel(a,b):
+    p = 7
+    return numpy.power(numpy.dot(a,b)+1, p)
+
 # A data point along with its corresponding target and alpha value
 DataPointInfo = namedtuple('DataPointInfo', ['point','target','alpha'])
 
@@ -73,7 +77,7 @@ def plot(classA, classB, ps, b):
 
 def main():
     global t, N
-    classA, classB = test_gen.test_classes_1()
+    classA, classB = test_gen.test_classes_3()
     data_points = test_gen.generate_input_data(classA, classB)
     x = [p.coords for p in data_points]
     t = [p.target for p in data_points]
