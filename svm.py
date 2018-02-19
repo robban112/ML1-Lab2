@@ -26,7 +26,7 @@ def linear_kernel(a, b):
 def radial_kernel(sigma, x, y):
     diff = numpy.subtract(x,y)
     norm = LA.norm(diff)
-    exp = -(norm**2 / 2*(sigma**2))
+    exp = -((norm**2) / (2*(sigma**2)))
     return math.exp(exp)
 
 def polynomial_kernel(a,b):
