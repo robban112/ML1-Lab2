@@ -1,12 +1,12 @@
 import numpy, random ,math
 from scipy.optimize import minimize
-import matplotlib.pyplot as plt
 from collections import namedtuple
-import testdata_generator as test_gen
 from numpy import linalg as LA
 
 global t
 global N
+
+######### INTERNAL/PRIVATE FUNCTIONS #########
 
 def zerofun(alfa):
     " Defines the upper bound to incorporate slack variables "
@@ -16,22 +16,6 @@ def objective(alfa, P):
     m = numpy.matrix([[alfa[i]*alfa[j]*P[i][j] for i in range(0,N)] for j in range(0,N)])
     n = numpy.array([alfa[i] for i in range(0,N)])
     return m.sum()/2 - n.sum()
-
-def K(a,b):
-    return radial_kernel(0.5,a,b)
-
-def linear_kernel(a, b):
-    return numpy.dot(a,b)
-
-def radial_kernel(sigma, x, y):
-    diff = numpy.subtract(x,y)
-    norm = LA.norm(diff)
-    exp = -((norm**2) / (2*(sigma**2)))
-    return math.exp(exp)
-
-def polynomial_kernel(a,b):
-    p = 7
-    return numpy.power(numpy.dot(a,b)+1, p)
 
 # A data point along with its corresponding target and alpha value
 DataPointInfo = namedtuple('DataPointInfo', ['point','target','alpha'])
@@ -55,45 +39,48 @@ def ind_no_b(s, ps, K):
     sum_f = lambda p: p.alpha*p.target*K(s,p.point)
     return sum(map(sum_f, ps))
 
-def ind(s, ps, K, b):
-    "The indicator function for vector s"
-    return ind_no_b(s, ps, K) - b
-
 def calc_b(ps, K):
     s, s_t, _ = ps[0]
     return ind_no_b(s, ps, K) - s_t
 
-def plot(classA, classB, ps, b):
-    plt.plot([p[0] for p in classA], [p[1] for p in classA],'b.')
-    plt.plot([p[0] for p in classB], [p[1] for p in classB],'r.')
-    plt.axis('equal')
-    xgrid=numpy.linspace(-5,5)
-    ygrid=numpy.linspace(-4,4)
-    grid=numpy.array([[ind((x,y), ps, K, b) for x in xgrid ] for y in ygrid])
-    plt.contour(xgrid, ygrid, grid, (-1.0,0.0,1.0), colors =('red' ,'black' , 'blue'),
-                                                              linewidths=(1 , 3 , 1))
-    plt.show()
+# Kernels
+def linear_kernel(a, b):
+    return numpy.dot(a,b)
 
+def radial_kernel(sigma):
+    def rad_kernel(x, y):
+        diff = numpy.subtract(x,y)
+        norm = LA.norm(diff)
+        exp = -((norm**2) / (2*(sigma**2)))
+        return math.exp(exp)
+    return rad_kernel
 
-def main():
+def polynomial_kernel(p):
+    def poly_kernel(a,b):
+        return numpy.power(numpy.dot(a,b)+1, p)
+    return poly_kernel
+
+################# PUBLIC API #################
+
+# A Support Vector Machine
+SVM = namedtuple('SVM', ['ps','K','b'])
+
+def train_svm(data_points, targets, kernel, C):
+    "Train a Support Vector Machine using the given data, kernel and C value"
     global t, N
-    classA, classB = test_gen.test_classes_3()
-    data_points = test_gen.generate_input_data(classA, classB)
-    x = [p.coords for p in data_points]
-    t = [p.target for p in data_points]
-    C=20
-    N = len(data_points)
+    x, t, K = (data_points, targets, kernel)
+    N = len(x)
     start = numpy.zeros(N)
     P = numpy.array([[t[i]*t[j]*K(x[i], x[j]) for i in range(0,N)] for j in range(0,N)])
     ret = minimize(objective, start, args=(P), bounds=[(0, C) for b in range(N)],
             constraints={'type':'eq', 'fun':zerofun})
     if not ret.success:
-        print("Optimization was unsuccessful")
-        return
+        return None
     alpha = ret['x']
     ps = list(filter(is_support_vector, map(DataPointInfo._make, zip(x,t,alpha))))
     b = calc_b(ps, K)
-    plot(classA, classB, ps, b)
+    return SVM(ps=ps, K=K, b=b)
 
-if __name__ == "__main__":
-    main()
+def ind(s, svm):
+    "The indicator function for vector s"
+    return ind_no_b(s, svm.ps, svm.K) - svm.b
