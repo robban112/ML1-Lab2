@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy
 
 def plot(classA, classB, svm):
+    "Plot the bounderies"
     plt.plot([p[0] for p in classA], [p[1] for p in classA],'b.')
     plt.plot([p[0] for p in classB], [p[1] for p in classB],'r.')
     plt.axis('equal')
@@ -15,12 +16,17 @@ def plot(classA, classB, svm):
     plt.show()
 
 def main():
+    # 1. generate the training data
     classA, classB = test_gen.test_classes_3()
     data_points = test_gen.generate_input_data(classA, classB)
     x = [p.coords for p in data_points]
     t = [p.target for p in data_points]
+
+    # 2. train the SVM
     K = radial_kernel(sigma=0.4)
     svm = train_svm(data_points=x, targets=t, kernel=K, C=20)
+
+    # 3. plot the SVM bounderies
     plot(classA, classB, svm)
 
 if __name__ == "__main__":
